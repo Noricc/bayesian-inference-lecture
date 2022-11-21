@@ -12,11 +12,14 @@
 \usepackage{tikz}
 \usepackage{libertine}
 \usepackage{fancyvrb}
+
 % \usefonttheme{serif}
 
 \usetikzlibrary{tikzmark}
 \usetikzlibrary {arrows.meta}
 \usetikzlibrary{positioning}
+
+\tikzstyle{every picture} += [remember picture]
 
 \setminted[java]{autogobble=true,bgcolor=LightGray,linenos}
 \setminted[python]{autogobble=true,bgcolor=LightGray,linenos}
@@ -71,18 +74,78 @@
 \section{Performance Example}
 
 \begin{frame}
-  We show an example of two running times, and
-  compare their means
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/samples_a_b.pdf}
+    \caption{Which program is faster?}
+  \end{figure}
+
+\end{frame}
+
+\begin{frame}{Normal Distribution}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/normal_distribution.pdf}
+    % \caption{\label{fig:label} }
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Sampling}
+  % Show ``the mean'' doesn't really exist, it has some error!
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/mean_error.pdf}
+  \end{figure}
 \end{frame}
 
 \begin{frame}
-  Show ``the mean'' doesn't really exist, it has some error!
+  \huge{Statistics}
+
+  Working with numbers you \textbf{can't trust}
+\end{frame}
+
+\section{Maximum Likelihood Estimation}
+
+\begin{frame}{Likelihood}
+  \begin{equation*}
+    P(\text{what I saw}|\text{my parameters})
+  \end{equation*}
+\end{frame}
+
+\begin{frame}{MLE Example}
+Biased coin example.
+
+(Maybe use Venus instead (cloud mask the sea!))
+\end{frame}
+
+\begin{frame}{Maximum Likelihood Estimation}
+  This is flexible!
+  Works with any function from parameters to probability.
+
+  But:
+  \begin{itemize}
+    \item Needs some computational tricks (log-probabilites)
+    \item Returns one single value!
+    \item What if very little data?
+  \end{itemize}
 \end{frame}
 
 \section{Bayesian Statistics}
 
 \begin{frame}
-  Distributions in, distributions out
+What does a probability \textbf{mean}?
+\end{frame}
+
+\begin{frame}{Frequentist and Bayesian}
+  \begin{block}{Frequentist}
+    If I flip a coin for an \textbf{infinite number of times},
+    half of the flips will turn heads.
+  \end{block}
+
+  \begin{block}{Bayesian}
+    I do not know which side the coin I will see,
+    so I say they have \textbf{equal chances}.
+  \end{block}
 \end{frame}
 
 \begin{frame}
@@ -96,6 +159,48 @@
   (Use the hot/cold metaphor)
 \end{frame}
 
+\begin{frame}{Bayes' Theorem}
+  \begin{equation*}
+    \tikz[baseline]{\node[anchor=base] (pab) {$P(A) \times P(B|A)$}}
+    =
+    \tikz[baseline]{\node[anchor=base] (pba) {$P(B) \times P(A|B)$}}
+  \end{equation*}
+  \begin{tikzpicture}[overlay, thick]
+    \node<2->[above=of pab.north] (exp)  {$P(A \cap B)$};
+    \node<2->[above=of pba.north] (exp1) {$P(B \cap A)$};
+    % \node at (0, 1) {Other explanation};
+
+    \draw<2-> (exp) -- (pab);
+    \draw<2-> (exp1) -- (pba);
+  \end{tikzpicture}
+
+\end{frame}
+
+\newcommand{\markmath}[2]{\tikz[baseline]{\node[anchor=base] (#1) {$#2$}}}
+
+\begin{frame}{Bayes' Theorem}
+\begin{equation*}
+  \markmath{posterior}{P(H|E)}
+  =
+  \frac{\markmath{prior}{P(H)} \times \markmath{likelihood}{P(E|H)}} {\markmath{norm}{P(E)}}
+\end{equation*}
+
+\begin{tikzpicture}[overlay, thick,>=Stealth]
+  \node<2->[above left=of prior] (priorlabel) {Prior};
+  \node<3->[above right=of likelihood] (liklabel) {Likelihood};
+  \node<4->[left=of posterior] (postlabel) {Posterior};
+  \node<5->[below=of norm] (normlabel) {Normalization};
+
+
+  \draw<2->[->] (priorlabel) -- (prior);
+  \draw<3->[->] (liklabel) -- (likelihood);
+  \draw<4->[->] (postlabel) -- (posterior.west);
+  \draw<5->[->] (normlabel) -- (norm);
+\end{tikzpicture}
+\end{frame}
+
+
+
 \section{Linear regression}
 
 \begin{frame}
@@ -107,12 +212,108 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/linear_data.pdf}
+  \caption{\label{fig:label} Simulated data}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/linear_prediction_interval.pdf}
+    \caption{\label{fig:label} }
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/linear_prior_lines.pdf}
+    \caption{\label{fig:label} }
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/posterior_lines.pdf}
+    \caption{\label{fig:label} }
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/posterior_parameters.pdf}
+  \caption{\label{fig:label} }
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \begin{tikzpicture}[thick,>=Stealth]
+    \node (priors) at (-1, 1) {Prior(s)};
+    \node (posteriors) at (0,0) {Posterior(s)};
+    \node (likelihood) at (1,1) {Likelihood};
+    \node (data) at (0,2) {Observations};
+    \node (structure) at (2,2) {Structure};
+
+    \draw[->] (priors) -- (posteriors);
+    \draw[->] (likelihood) -- (posteriors);
+    \draw[->] (data) -- (likelihood);
+    \draw[->] (structure) -- (likelihood);
+  \end{tikzpicture}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/predictions.pdf}
+  \caption{\label{fig:label} }
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/prediction_distrubtions.pdf}
+  \caption{\label{fig:label} }
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/prediction_difference.pdf}
+  \caption{\label{fig:label} }
+\end{figure}
+\end{frame}
+
+
 \section{Causal Inference}
 
 \begin{frame}
+  \center
+  \huge
   Correlation isn't causation
 
+  \footnotesize
   (But then what is causation?)
+\end{frame}
+
+\begin{frame}
+  \center
+  \huge
+  Causation
+
+  \small
+  X causes Y if Y relies on X for its value
 \end{frame}
 
 \begin{frame}
@@ -126,19 +327,52 @@
 \end{frame}
 
 \begin{frame}
+  \center
+  \huge
+  Direct causes
+
+  \begin{tikzpicture}[thick, >=Stealth]
+    \node (x) at (-1, 0) {X};
+    \node (y) at (1, 0) {Y};
+
+    \draw[->] (x) -- (y);
+  \end{tikzpicture}
+
+  \begin{tikzpicture}[thick, >=Stealth]
+    \node (x) at (-1, 0) {X};
+    \node (y) at (1, 0) {Y};
+
+    \draw[->] (y) -- (x);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Confounding}
+  \center
+  \begin{tikzpicture}[thick,>=Stealth]
+    \node (tobacco) at (-2, 0) {Tobacco};
+    \node (cancer) at (2,0) {Cancer};
+
+    \draw[->] (tobacco) -- (cancer) node[midway, above] {?};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Confounding}
+  \center
+  \begin{tikzpicture}[thick,>=Stealth]
+    \node (tobacco) at (-2, 0) {Tobacco};
+    \node (cancer) at (2,0) {Cancer};
+    \node (genes) at (0, 2) {Genetic Factors};
+
+    \draw[->] (tobacco) -- (cancer) node[midway, above] {?};
+    \draw[->] (genes) -- (tobacco);
+    \draw[->] (genes) -- (cancer);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
   \begin{center}
-    \begin{tikzpicture}[thick, >=Stealth]
-        \node (x) at (-1, 0) {X};
-        \node (y) at (1, 0) {Y};
+    Confounder (or Fork)
 
-        \draw[->] (x) -- (y);
-    \end{tikzpicture}
-    \begin{tikzpicture}[thick, >=Stealth]
-        \node (x) at (-1, 0) {X};
-        \node (y) at (1, 0) {Y};
-
-        \draw[->] (y) -- (x);
-    \end{tikzpicture}
     \begin{tikzpicture}[thick, >=Stealth]
         \node (x) at (-1, 0) {X};
         \node (y) at (1, 0) {Y};
@@ -147,23 +381,44 @@
         \draw[->] (z) -- (x);
         \draw[->] (z) -- (y);
     \end{tikzpicture}
-    \begin{tikzpicture}[thick, >=Stealth]
-        \node (x) at (-1, 0) {X};
-        \node (y) at (1, 0) {Y};
-        \node (z) at (0, -1) {Z};
 
-        \draw[->] (x) -- (z);
-        \draw[->] (y) -- (z);
-    \end{tikzpicture}
   \end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+  \huge
+  Collider
+
+  \begin{tikzpicture}[thick, >=Stealth]
+    \node (x) at (-1, 0) {X};
+    \node (y) at (1, 0) {Y};
+    \node (z) at (0, -1) {Z};
+
+    \draw[->] (x) -- (z);
+    \draw[->] (y) -- (z);
+  \end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{The Secret of Stats}
+    \begin{enumerate}
+    \item Generate some fake data (Gelman, McElreath)
+    \item Make a statistical model
+    \item Test if the model can recover parameters
+    \item Use it on experimental data
+    \end{enumerate}
+  \end{block}
 \end{frame}
 
 \begin{frame}
   Further reading:
   \begin{itemize}
+  \item Bayesian Methods for Hackers
   \item Statistical Rethinking
   \item The Book of Why
-  \item Causal Inference, a primer
+  \item Causal Inference In Statistics, a primer
   \end{itemize}
 \end{frame}
 
