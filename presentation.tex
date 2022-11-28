@@ -4,7 +4,7 @@
 
 % \usetheme{LU-spfaff}
 
-\usepackage[utf8]{inputenc}
+%\usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
 \usepackage{grffile}
 \usepackage{minted}
@@ -12,11 +12,14 @@
 \usepackage{tikz}
 \usepackage{libertine}
 \usepackage{fancyvrb}
+\usepackage{xspace}
+
+\usepackage{emoji}
 
 % \usefonttheme{serif}
 
 \usetikzlibrary{tikzmark}
-\usetikzlibrary {arrows.meta}
+\usetikzlibrary{arrows.meta}
 \usetikzlibrary{positioning}
 \usetikzlibrary{decorations.pathmorphing, decorations.pathreplacing, decorations.shapes,}
 
@@ -26,6 +29,11 @@
 \setminted[python]{autogobble=true,bgcolor=LightGray,linenos}
 
 \setmonofont{Fira Code}
+\usepackage[sfdefault]{FiraSans}
+\usepackage{fontspec}
+\newfontfamily{\NotoEmoji} {Noto Color Emoji}[Renderer=Harfbuzz]
+\newfontfamily{\DejaSans} {DejaVu Sans}
+\newfontfamily{\NotoSans} {Noto Sans}
 
 \title[]{Bayesian Statistics}
 
@@ -72,6 +80,15 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}
+  \begin{block}{My job}
+  \begin{enumerate}
+  \item <2->Run programs
+  \item <3->Count stuff
+  \end{enumerate}
+  \end{block}
+\end{frame}
+
 \section{Performance Example}
 
 \begin{frame}
@@ -80,7 +97,11 @@
     \includegraphics[width=\textwidth]{figures/samples_a_b.pdf}
     \caption{Which program is faster?}
   \end{figure}
+\end{frame}
 
+\begin{frame}
+  \center
+  Can we trust the means we compute?
 \end{frame}
 
 \begin{frame}{Normal Distribution}
@@ -175,18 +196,67 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}
+  \center
+  \huge
+  Bayesian inference
+
+  \small
+  Making fuzzy estimates of things
+\end{frame}
+
+\section{The Crush Problem}
+
+\newcommand{\love}[0]{{\NotoEmoji ❤️}\xspace}
+\newcommand{\flowers}[0]{{\emoji{bouquet}}\xspace}
+
+\begin{frame}{The Crush Problem}
+  \begin{itemize}
+  \item You observed \flowers.
+  \item What is $P(\text{\love}|\text{\flowers})$?
+  \end{itemize}
+\end{frame}
+
 \section{Maximum Likelihood Estimation}
 
 \begin{frame}{Likelihood}
-  \begin{equation*}
-    P(\text{observed data}|\text{(hidden) parameters})
-  \end{equation*}
+  \begin{align*}
+    &P(\text{observed data}|\text{hypothesis})\\
+    &P(\text{\flowers}|\text{\love})
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Maximum Likelihood}
+  \begin{align*}
+    P(\text{\flowers}|\text{\love}) &= 0.3 \\
+    P(\text{\flowers}|\text{\emoji{broken-heart}}) &= 0.02
+  \end{align*}
+  \begin{itemize}[<2->]
+    \item<2-> P(\text{\flowers}|\text{\love}) > P(\text{\flowers}|\text{\emoji{broken-heart}})
+    \item<3-> \textbf{Conclusion:} \love
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Maximum Likelihood}
+  \begin{align*}
+    P(\text{\flowers}|\text{\love}) &= 0.3 \\
+    P(\text{\flowers}|\text{\emoji{orange-heart}}) &= 0.15 \\
+    P(\text{\flowers}|\text{\emoji{yellow-heart}}) &= 0.075 \\
+    P(\text{\flowers}|\text{\emoji{white-heart}}) &= 0.02 \\
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \begin{align*}
+    P(\text{\flowers}|\text{\love}) \neq P(\text{\love}|\text{\flowers})
+  \end{align*}
 \end{frame}
 
 \begin{frame}{MLE Example}
-Biased coin example.
-
-(Maybe use Venus instead (cloud mask the sea!))
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/maximum_likelihood_estimation.pdf}
+  \end{figure}
 \end{frame}
 
 \begin{frame}{Maximum Likelihood Estimation}
@@ -217,18 +287,7 @@ Biased coin example.
   \end{block}
 \end{frame}
 
-\begin{frame}
-  \begin{itemize}
-  \item Bayes theorem
-  \item Prior distribution
-  \item Likelihood
-  \item Posterior distribution
-  \end{itemize}
-
-  (Use the hot/cold metaphor)
-\end{frame}
-
-\begin{frame}{Bayes' Rule}
+\begin{frame}{Bayes' rule}
   \begin{equation*}
     \tikz[baseline]{\node[anchor=base] (pab) {$P(A) \times P(B|A)$}}
     =
@@ -242,8 +301,32 @@ Biased coin example.
     \draw<2-> (exp) -- (pab);
     \draw<2-> (exp1) -- (pba);
   \end{tikzpicture}
-
 \end{frame}
+
+\begin{frame}{Bayes' Rule}
+  \begin{equation*}
+    \tikz[baseline]{\node[anchor=base] (pab) {$P(\text{\love}) \times P(\text{\flowers}|\text{\love})$}}
+    =
+    \tikz[baseline]{\node[anchor=base] (pba) {$P(\text{\flowers}) \times P(\text{\love}|\text{\flowers})$}}
+  \end{equation*}
+  \begin{tikzpicture}[overlay, thick]
+    \node<2->[above=of pab.north] (exp)  {$P(\text{\love} \cap \text{\flowers})$};
+    \node<2->[above=of pba.north] (exp1) {$P(\text{\flowers} \cap \text{\love})$};
+    % \node at (0, 1) {Other explanation};
+
+    \draw<2-> (exp) -- (pab);
+    \draw<2-> (exp1) -- (pba);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Bayes' Rule}
+\begin{equation*}
+  P(\text{\love}|\text{\flowers})
+  =
+  \frac{P(\text{\love}) \times P(\text{\flowers}|\text{\love})} {P(\text{\flowers})}
+\end{equation*}
+\end{frame}
+
 
 \newcommand{\markmath}[2]{\tikz[baseline]{\node[anchor=base] (#1) {$#2$}}}
 
@@ -275,12 +358,126 @@ Biased coin example.
 \end{frame}
 
 \begin{frame}
+  \begin{block}{Bayesian Statistics}
+    \begin{enumerate}
+    \item Express your \emph{beliefs} in math (priors)
+    \item Test them against the evidence (likelihood)
+    \item Update your beliefs (posteriors)
+    \end{enumerate}
+  \end{block}
+
+  % \begin{centering}
+  %   <2->{Distributions in, Distributions out}
+  % \end{centering}
+\end{frame}
+
+\begin{frame}
   \begin{itemize}
   \item Flexible!
   \item Needs some computational tricks too
   \item Returns distributions
   \item Works with little data
   \end{itemize}
+\end{frame}
+
+\section{Comparing two means}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/samples_a_b.pdf}
+    % \caption{\label{fig:label} }
+  \end{figure}
+\end{frame}
+
+% We use the notation from McElreath p.32
+% Paramters and observed parameter
+\newcommand{\parameter}[1]{\textcolor{orange}{#1}}
+\newcommand{\observed}[1]{\textcolor{cyan}{#1}}
+
+\newcommand{\normal}[1]{\text{Normal}(#1)}
+\newcommand{\exponential}[1]{\text{Exponential}(#1)}
+
+\begin{frame}[fragile]
+    \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
+    function generate_samples()
+        mu_a = 15.0
+        mu_b = 13.0
+
+        sigma_a = 4.0
+        sigma_b = 2.0
+
+        n_a = 30
+        n_b = 20
+
+        As = zeros(n_a)
+        Bs = zeros(n_b)
+        for i in 1:n_a
+            As[i] = rand(Normal(mu_a, sigma_a))
+        end
+
+        for i in 1:n_b
+            Bs[i] = rand(Normal(mu_b, sigma_b))
+        end
+
+        return (As,Bs)
+    end
+    \end{minted}
+\end{frame}
+
+\begin{frame}{Mathematical Model}
+  \begin{align*}
+    \observed{A_i} &\sim \normal{\parameter{\mu_A}, \parameter{\sigma_A}}\\
+    \observed{B_i} &\sim \normal{\parameter{\mu_B}, \parameter{\sigma_B}}\\
+    \parameter{\mu_A} &\sim \normal{10.0, 5.0}\\
+    \parameter{\mu_B} &\sim \normal{10.0, 5.0}\\
+    \parameter{\sigma_A} &\sim \exponential{1.0}\\
+    \parameter{\sigma_B} &\sim \exponential{1.0}\\
+  \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{minted}{julia}
+@model function means_model(As, Bs)
+    # Priors
+    mean_a ~ Normal(10.0, 5.0)
+    mean_b ~ Normal(10.0, 5.0)
+
+    stdev_a ~ Exponential(1.0)
+    stdev_b ~ Exponential(1.0)
+
+    # Likelihood
+    for i in eachindex(As)
+        As[i] ~ Normal(mean_a, stdev_a)
+    end
+
+    for i in eachindex(Bs)
+        Bs[i] ~ Normal(mean_b, stdev_b)
+    end
+end
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{minted}[autogobble]{julia}
+    # Create model (pass the data to it)
+    model = means_model(samples_a, samples_b)
+    # Run bayesian inference
+    chain = sample(model, NUTS(0.65), 5000)
+    # Get posterior samples for a variable in model
+    chain[:mean_a]
+  \end{minted}
+
+  $\rightarrow [15.472802298138921, 16.100226772118965, 16.034849776084318, \dots]$
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/plot_a_b_parameters.pdf}
+    % \caption{\label{fig:label} }
+  \end{figure}
+
 \end{frame}
 
 \section{Linear regression}
@@ -308,6 +505,16 @@ Biased coin example.
     \includegraphics[width=0.8\textwidth]{figures/linear_prediction_interval.pdf}
     \caption{\label{fig:label} }
   \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{align*}
+    \observed{y_i} &\sim \normal{\mu_i, \parameter{\sigma}}\\
+    \mu_i &= \parameter{\alpha} \observed{x_i} + \parameter{\beta}\\
+    \parameter{\alpha} &\sim \normal{0,1}\\
+    \parameter{\beta} &\sim \normal{0, 1}\\
+    \parameter{\sigma} &\sim \exponential{0.2}\\
+  \end{align*}
 \end{frame}
 
 \begin{frame}
@@ -358,6 +565,14 @@ Biased coin example.
   \huge
   \center
   Predictions return \emph{distributions} too!
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/linear_prediction_interval.pdf}
+    \caption{\label{fig:label} }
+  \end{figure}
 \end{frame}
 
 \begin{frame}
@@ -415,11 +630,11 @@ Biased coin example.
 
 \begin{frame}
   \begin{align*}
-    \log(ET_j) &\sim \text{Normal}(\mu, \sigma)\\
-    \mu &= \alpha[M_j] + \markmath{arrayaccess}{\beta[C_j]}\\
-    \markmath{alpha}{\alpha_i} &\sim \text{Normal}(0.0, 0.5)\\
-    \markmath{beta}{\beta_i} &\sim \text{Normal}(0.0, 0.2)\\
-    \sigma &\sim \text{Exponential}(1.0)\\
+    \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
+    \mu_j &= \parameter{\alpha}[\observed{M_j}] + \markmath{arrayaccess}{\parameter{\beta}[\observed{C_j}]}\\
+    \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
+    \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
+    \parameter{\sigma} &\sim \exponential{1.0}\\
   \end{align*}
 
   \begin{tikzpicture}[overlay, thick, >=Stealth]
@@ -430,6 +645,44 @@ Biased coin example.
     \draw<3->[->] (alphalabel) -- (alpha);
     \draw<3->[->] (alphalabel) -- (beta);
   \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \begin{align*}
+    \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
+    \mu_j &= \parameter{\gamma}[\observed{M_j}, \observed{C_j}]\\
+    \parameter{\gamma_{m,c}} &\sim \normal{0.0, 0.5}\\
+    \parameter{\sigma} &\sim \exponential{1.0}\\
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        $\alpha_1$ & $\alpha_2$ & $\alpha_3$ \\
+        \hline
+    \end{tabular}
+
+    \begin{tabular}{|c|c|c|}
+        \hline
+        $\beta_1$ & $\beta_2$  \\
+        \hline
+    \end{tabular}
+    \end{column}
+
+
+    \begin{column}{0.5\textwidth}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        $\gamma_{1,1}$ & $\gamma_{1,2}$ & $\gamma_{1,3}$ \\
+        \hline
+        $\gamma_{2,1}$ & $\gamma_{2,2}$ & $\gamma_{2,3}$ \\
+        \hline
+    \end{tabular}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \section{Prior Sensitivity Analysis}
