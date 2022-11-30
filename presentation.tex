@@ -84,7 +84,7 @@
   \begin{block}{My job}
   \begin{enumerate}
   \item <2->Run programs
-  \item <3->Count stuff
+  \item <3->Count stuff \emoji{stopwatch}
   \end{enumerate}
   \end{block}
 \end{frame}
@@ -102,6 +102,11 @@
 \begin{frame}
   \center
   Can we trust the means we compute?
+\end{frame}
+
+\begin{frame}
+  \center
+  \emoji{test-tube} Simulate and test \emoji{test-tube}
 \end{frame}
 
 \begin{frame}{Normal Distribution}
@@ -202,7 +207,7 @@
   Bayesian inference
 
   \small
-  Making fuzzy estimates of things
+  Make fuzzy estimates of things
 \end{frame}
 
 \section{The Crush Problem}
@@ -289,9 +294,9 @@
 
 \begin{frame}{Bayes' rule}
   \begin{equation*}
-    \tikz[baseline]{\node[anchor=base] (pab) {$P(A) \times P(B|A)$}}
+    \tikz[baseline]{\node[anchor=base] (pab) {$P(B|A) \times P(A)$}}
     =
-    \tikz[baseline]{\node[anchor=base] (pba) {$P(B) \times P(A|B)$}}
+    \tikz[baseline]{\node[anchor=base] (pba) {$P(A|B) \times P(B)$}}
   \end{equation*}
   \begin{tikzpicture}[overlay, thick]
     \node<2->[above=of pab.north] (exp)  {$P(A \cap B)$};
@@ -332,9 +337,9 @@
 
 \begin{frame}{Bayes' Rule}
 \begin{equation*}
-  \markmath{posterior}{P(H|E)}
+  \markmath{posterior}{P(\text{\love}|\text{\flowers})}
   =
-  \frac{\markmath{prior}{P(H)} \times \markmath{likelihood}{P(E|H)}} {\markmath{norm}{P(E)}}
+  \frac{\markmath{prior}{P(\text{\love})} \times \markmath{likelihood}{P(\text{\flowers}|\text{\love})}} {\markmath{norm}{P(\text{\flowers})}}
 \end{equation*}
 
 \begin{tikzpicture}[overlay, thick,>=Stealth]
@@ -353,7 +358,7 @@
 
 \begin{frame}{Bayes' Rule}
   \begin{equation*}
-    P(H|E) \propto P(H) \times P(E|H)
+    P(\text{\love}|\text{\flowers}) \propto P(\text{\love}) \times P(\text{\flowers}|\text{\love})
   \end{equation*}
 \end{frame}
 
@@ -374,7 +379,7 @@
 \begin{frame}
   \begin{itemize}
   \item Flexible!
-  \item Needs some computational tricks too
+  \item Needs some computational tricks too (lots!)
   \item Returns distributions
   \item Works with little data
   \end{itemize}
@@ -425,16 +430,7 @@
     \end{minted}
 \end{frame}
 
-\begin{frame}{Mathematical Model}
-  \begin{align*}
-    \observed{A_i} &\sim \normal{\parameter{\mu_A}, \parameter{\sigma_A}}\\
-    \observed{B_i} &\sim \normal{\parameter{\mu_B}, \parameter{\sigma_B}}\\
-    \parameter{\mu_A} &\sim \normal{10.0, 5.0}\\
-    \parameter{\mu_B} &\sim \normal{10.0, 5.0}\\
-    \parameter{\sigma_A} &\sim \exponential{1.0}\\
-    \parameter{\sigma_B} &\sim \exponential{1.0}\\
-  \end{align*}
-\end{frame}
+
 
 \begin{frame}[fragile]
   \begin{minted}{julia}
@@ -480,16 +476,23 @@ end
 
 \end{frame}
 
-\section{Linear regression}
+\begin{frame}{Mathematical Model}
+  \begin{align*}
+    \observed{A_i} &\sim \normal{\parameter{\mu_A}, \parameter{\sigma_A}}\\
+    \observed{B_i} &\sim \normal{\parameter{\mu_B}, \parameter{\sigma_B}}\\
+    \parameter{\mu_A} &\sim \normal{10.0, 5.0}\\
+    \parameter{\mu_B} &\sim \normal{10.0, 5.0}\\
+    \parameter{\sigma_A} &\sim \exponential{1.0}\\
+    \parameter{\sigma_B} &\sim \exponential{1.0}\\
+  \end{align*}
 
-\begin{frame}
   \begin{itemize}
-  \item Bayesian linear regression
-  \item Interactions
-  \item Counterfactual plots
-  \item Prior sensitivity analysis
+  \item \parameter{x} Parameter
+  \item \observed{x} Observed
   \end{itemize}
 \end{frame}
+
+\section{Linear regression}
 
 \begin{frame}
 \begin{figure}[ht]
@@ -500,14 +503,6 @@ end
 \end{frame}
 
 \begin{frame}
-  \begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/linear_prediction_interval.pdf}
-    \caption{\label{fig:label} }
-  \end{figure}
-\end{frame}
-
-\begin{frame}
   \begin{align*}
     \observed{y_i} &\sim \normal{\mu_i, \parameter{\sigma}}\\
     \mu_i &= \parameter{\alpha} \observed{x_i} + \parameter{\beta}\\
@@ -515,13 +510,17 @@ end
     \parameter{\beta} &\sim \normal{0, 1}\\
     \parameter{\sigma} &\sim \exponential{0.2}\\
   \end{align*}
+
+  \begin{itemize}
+  \item \parameter{x} Parameter
+  \item \observed{x} Observed
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
   \begin{figure}[ht]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/linear_prior_lines.pdf}
-    \caption{\label{fig:label} }
   \end{figure}
 \end{frame}
 
@@ -529,7 +528,6 @@ end
   \begin{figure}[ht]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/posterior_lines.pdf}
-    \caption{\label{fig:label} }
   \end{figure}
 \end{frame}
 
@@ -537,7 +535,6 @@ end
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/posterior_parameters.pdf}
-  \caption{\label{fig:label} }
 \end{figure}
 \end{frame}
 
@@ -592,11 +589,19 @@ end
 \begin{frame}
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.8\textwidth]{figures/prediction_difference.pdf}
+  \includegraphics[width=0.8\textwidth]{figures/posterior_ratio_prediction.pdf}
 \end{figure}
 \end{frame}
 
 \section{Analysing Experiments}
+
+\begin{frame}
+  How to make my programs faster
+
+  \pause
+
+  Is \textbf{depends}
+\end{frame}
 
 \begin{frame}
   \center
@@ -606,7 +611,7 @@ end
     \node[] (hardware) at (4,1.0) {Hardware};
     \node[] (usage) at (-4,0) {Collection usage};
     \node[] (compiler) at (4,0) {Compiler};
-    \node[] (runtime) at (0,0) {Runtime};
+    \node[] (runtime) at (0,-2) {Runtime};
 
     \draw[->] (collection) -- (perf.west);
     \draw[->] (usage) -- (perf);
@@ -622,18 +627,61 @@ end
     \node[] (collection) at (-4,1.0) {Collection type};
     \node[] (perf) at (0,1.0) {Execution time};
     \node[] (hardware) at (4,1.0) {Hardware};
+    \node[] (usage) at (-4,0) {Collection usage};
+    \node[] (compiler) at (4,0) {Compiler};
+    \node[] (jit-compilation) at (0, -0.5) {JIT-compilation};
+    \node[] (runtime) at (0,-2) {Runtime};
+
+    \draw[->] (collection) -- (perf.west);
+    \draw[->] (usage) -- (perf);
+    \draw[->] (hardware.west) -- (perf.east);
+    \draw[->] (runtime) -- (jit-compilation);
+    \draw[->] (jit-compilation) -- (perf);
+    \draw[->] (compiler) -- (perf);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \center
+  \begin{tikzpicture}[thick,>=Stealth]
+    \node[] (collection) at (-4,1.0) {Collection type};
+    \node[] (perf) at (0,1.0) {Execution time};
+    \node[] (hardware) at (4,1.0) {Hardware};
+    \node[] (usage) at (-4,0) {Collection usage};
+    \node[] (compiler) at (4,0) {Compiler};
+    \node[] (jit-compilation) at (0, -0.5) {Warmup};
+    \node[] (runtime) at (0,-2) {JVM};
+
+    \draw[->] (collection) -- (perf.west);
+    \draw[->] (usage) -- (perf);
+    \draw[->] (hardware.west) -- (perf.east);
+    \draw[->] (runtime) -- (jit-compilation);
+    \draw[->] (jit-compilation) -- (perf);
+    \draw[->] (compiler) -- (perf);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \center
+  \begin{tikzpicture}[thick,>=Stealth]
+    \node[] (collection) at (-4,0.0) {Collection type};
+    \node[] (perf) at (0,0.0) {Execution time};
+    \node[] (hardware) at (4,0.0) {Hardware};
+    \node[] (warmup) at (0, -2) {JVM Warmup};
 
     \draw[->] (collection) -- (perf.west);
     \draw[->] (hardware.west) -- (perf.east);
+    \draw[->] (warmup) -- (perf);
   \end{tikzpicture}
 \end{frame}
 
 \begin{frame}
   \begin{align*}
     \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
-    \mu_j &= \parameter{\alpha}[\observed{M_j}] + \markmath{arrayaccess}{\parameter{\beta}[\observed{C_j}]}\\
+    \mu_j &= \parameter{\alpha}[\observed{M_j}] + \parameter{\beta}[\observed{W_j}] + \markmath{arrayaccess}{\parameter{\gamma}[\observed{T_j}]}\\
     \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
     \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
+    \markmath{gamma}{\parameter{\gamma_i}} &\sim \normal{0.0, 0.2}\\
     \parameter{\sigma} &\sim \exponential{1.0}\\
   \end{align*}
 
@@ -645,44 +693,93 @@ end
     \draw<3->[->] (alphalabel) -- (alpha);
     \draw<3->[->] (alphalabel) -- (beta);
   \end{tikzpicture}
+
+  \begin{itemize}
+  \item \parameter{x} Parameter
+  \item \observed{x} Observed
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{(Discrete) Interactions}
+    Transform an \textbf{array} of coefficients into a \textbf{matrix}
+  \end{block}
 \end{frame}
 
 \begin{frame}
   \begin{align*}
     \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
-    \mu_j &= \parameter{\gamma}[\observed{M_j}, \observed{C_j}]\\
-    \parameter{\gamma_{m,c}} &\sim \normal{0.0, 0.5}\\
+    \mu_j &= \parameter{\alpha}[\observed{M_j}] + \parameter{\beta}[\observed{W_j}] + \parameter{\gamma^{M}}[\observed{M_j}, \observed{T_j}] + \parameter{\gamma^{W}}[\observed{W_j}, \observed{T_j}]\\
+    \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
+    \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
+    \markmath{gamma}{\parameter{\gamma^{W}_{w,t}}} &\sim \normal{0.0, 0.2}\\
+    \markmath{gamma}{\parameter{\gamma^{M}_{m,t}}} &\sim \normal{0.0, 0.2}\\
     \parameter{\sigma} &\sim \exponential{1.0}\\
   \end{align*}
+
+  \begin{itemize}
+  \item \parameter{x} Parameter
+  \item \observed{x} Observed
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
   \begin{columns}
     \begin{column}{0.5\textwidth}
-    \begin{tabular}{|c|c|c|}
-        \hline
-        $\alpha_1$ & $\alpha_2$ & $\alpha_3$ \\
-        \hline
-    \end{tabular}
+      \begin{align*}
+        \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
+        \mu_j &= \parameter{\alpha}[\observed{M_j}] + \markmath{arrayaccess}{\parameter{\beta}[\observed{C_j}]}\\
+        \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
+        \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
+        \parameter{\sigma} &\sim \exponential{1.0}\\
+      \end{align*}
 
-    \begin{tabular}{|c|c|c|}
-        \hline
-        $\beta_1$ & $\beta_2$  \\
-        \hline
-    \end{tabular}
+      \begin{tikzpicture}[minimum size=1cm]
+        \node[draw] at (-1, 0) {$\alpha_1$};
+        \node[draw] at (0, 0) {$\alpha_2$};
+
+        \node[draw] at (-1, -1) {$\beta_1$};
+        \node[draw] at (0, -1) {$\beta_2$};
+        \node[draw] at (1, -1) {$\beta_3$};
+      \end{tikzpicture}
     \end{column}
-
 
     \begin{column}{0.5\textwidth}
-    \begin{tabular}{|c|c|c|}
-        \hline
-        $\gamma_{1,1}$ & $\gamma_{1,2}$ & $\gamma_{1,3}$ \\
-        \hline
-        $\gamma_{2,1}$ & $\gamma_{2,2}$ & $\gamma_{2,3}$ \\
-        \hline
-    \end{tabular}
+      \begin{align*}
+        \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
+        \mu_j &= \parameter{\gamma}[\observed{M_j}, \observed{C_j}]\\
+        \parameter{\gamma_{m,c}} &\sim \normal{0.0, 0.5}\\
+        \parameter{\sigma} &\sim \exponential{1.0}\\
+      \end{align*}
+
+      \begin{tikzpicture}[minimum size=1cm]
+        \node[draw] at (-1, 0) {$\gamma_{1,1}$};
+        \node[draw] at (0, 0) {$\gamma_{1,2}$};
+        \node[draw] at (1, 0) {$\gamma_{1,3}$};
+
+        \node[draw] at (-1, -1) {$\gamma_{2,1}$};
+        \node[draw] at (0, -1) {$\gamma_{2,2}$};
+        \node[draw] at (1, -1) {$\gamma_{2,3}$};
+      \end{tikzpicture}
     \end{column}
   \end{columns}
+\end{frame}
+
+
+\section{Hierarchical Models}
+
+\begin{frame}
+  \center
+  \textbf{Hyperpriors}
+
+  {Priors can have priors too}
+
+  \pause
+
+  \huge
+  {\emoji{exploding-head}}
+
+  % \emph{Hyperpriors} are priors which are \emph{partially} learned from the data.
 \end{frame}
 
 \section{Prior Sensitivity Analysis}
