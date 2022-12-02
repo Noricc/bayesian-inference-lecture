@@ -257,12 +257,12 @@
   \end{align*}
 \end{frame}
 
-\begin{frame}{MLE Example}
-  \begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/maximum_likelihood_estimation.pdf}
-  \end{figure}
-\end{frame}
+% \begin{frame}{MLE Example}
+%   \begin{figure}[ht]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figures/maximum_likelihood_estimation.pdf}
+%   \end{figure}
+% \end{frame}
 
 \begin{frame}{Maximum Likelihood Estimation}
   \begin{itemize}
@@ -463,8 +463,20 @@ end
     # Get posterior samples for a variable in model
     chain[:mean_a]
   \end{minted}
+\end{frame}
 
-  $\rightarrow [15.472802298138921, 16.100226772118965, 16.034849776084318, \dots]$
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[height=0.7\textheight]{figures/chain_mean.pdf}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[height=0.7\textheight]{figures/chain_stdev.pdf}
+  \end{figure}
 \end{frame}
 
 \begin{frame}
@@ -474,6 +486,28 @@ end
     % \caption{\label{fig:label} }
   \end{figure}
 
+\end{frame}
+
+\section{Posterior predictive simulation}
+
+\begin{frame}
+  \huge
+  \center
+  Predictions return \emph{distributions} too!
+\end{frame}
+
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/plot_difference_a_b.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/predicted_difference_a_b.pdf}
+\end{figure}
 \end{frame}
 
 \begin{frame}{Mathematical Model}
@@ -589,14 +623,45 @@ end
 \begin{frame}
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.8\textwidth]{figures/posterior_ratio_prediction.pdf}
+  \includegraphics[width=0.8\textwidth]{figures/prediction_difference.pdf}
 \end{figure}
+\end{frame}
+
+\section{Interactions}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/plot_interaction.pdf}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
+    @model function interaction_model(N, xs, ys, teams)
+        a ~ filldist(Normal(0.0, 0.5), 2)
+
+        b ~ filldist(Normal(0.0, 0.5), 2)
+
+        sigma ~ Exponential(1.0)
+
+        for i in 1:N
+            if teams[i] == 1.0
+                mu_1 = a[1] * xs[i] + b[1]
+                ys[i] ~ Normal(mu_1, sigma)
+            else
+                mu_2 = a[2] * xs[i] + b[2]
+                ys[i] ~ Normal(mu_2, sigma)
+            end
+        end
+    end
+  \end{minted}
 \end{frame}
 
 \section{Analysing Experiments}
 
 \begin{frame}
-  How to make my programs faster
+  How to make my programs faster?
 
   \pause
 
@@ -675,13 +740,44 @@ end
   \end{tikzpicture}
 \end{frame}
 
+\begin{frame}[fragile]
+  \begin{align*}
+    \observed{ET_j} &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
+    \mu_j &= \observed{\overline{ET}} \times \parameter{\alpha}[\observed{M_j}] \times \parameter{\beta}[\observed{W_j}] \times \markmath{arrayaccess}{\parameter{\gamma}[\observed{T_j}]}\\
+    \markmath{alpha}{\parameter{\alpha_m}} &\sim \normal{0.0, 0.5}\\
+    \markmath{beta}{\parameter{\beta_w}} &\sim \normal{0.0, 0.2}\\
+    \markmath{gamma}{\parameter{\gamma_t}} &\sim \normal{0.0, 0.2}\\
+    \parameter{\sigma} &\sim \exponential{30.0}\\
+  \end{align*}
+
+  \begin{tikzpicture}[overlay, thick, >=Stealth]
+    \node<2->[right=2cm of arrayaccess] (arrayaccesslabel) {Array access};
+    \draw<2->[->] (arrayaccesslabel) -- (arrayaccess);
+
+    \node<3->[left=2cm of alpha] (alphalabel) {Arrays};
+    \draw<3->[->] (alphalabel) -- (alpha);
+    \draw<3->[->] (alphalabel) -- (beta);
+  \end{tikzpicture}
+
+  \begin{itemize}
+  \item \parameter{x} Parameter
+  \item \observed{x} Observed
+  \end{itemize}
+\end{frame}
+
 \begin{frame}
+  \begin{equation*}
+    \log(ab) = \log(a) + \log(b)
+  \end{equation*}
+\end{frame}
+
+\begin{frame}[fragile]
   \begin{align*}
     \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
-    \mu_j &= \parameter{\alpha}[\observed{M_j}] + \parameter{\beta}[\observed{W_j}] + \markmath{arrayaccess}{\parameter{\gamma}[\observed{T_j}]}\\
-    \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
-    \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
-    \markmath{gamma}{\parameter{\gamma_i}} &\sim \normal{0.0, 0.2}\\
+    \mu_j &= \log(\observed{\overline{ET}}) + \parameter{\alpha}[\observed{M_j}] + \parameter{\beta}[\observed{W_j}] + \markmath{arrayaccess}{\parameter{\gamma}[\observed{T_j}]}\\
+    \markmath{alpha}{\parameter{\alpha_m}} &\sim \normal{1.0, 0.5}\\
+    \markmath{beta}{\parameter{\beta_w}} &\sim \normal{1.0, 0.2}\\
+    \markmath{gamma}{\parameter{\gamma_t}} &\sim \normal{1.0, 0.2}\\
     \parameter{\sigma} &\sim \exponential{1.0}\\
   \end{align*}
 
@@ -709,9 +805,9 @@ end
 \begin{frame}
   \begin{align*}
     \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
-    \mu_j &= \parameter{\alpha}[\observed{M_j}] + \parameter{\beta}[\observed{W_j}] + \parameter{\gamma^{M}}[\observed{M_j}, \observed{T_j}] + \parameter{\gamma^{W}}[\observed{W_j}, \observed{T_j}]\\
-    \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
-    \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
+    \mu_j &= \log(\observed{\overline{ET}}) + \parameter{\alpha}[\observed{M_j}] + \parameter{\beta}[\observed{W_j}] + \parameter{\gamma^{M}}[\observed{M_j}, \observed{T_j}] + \parameter{\gamma^{W}}[\observed{W_j}, \observed{T_j}]\\
+    \markmath{alpha}{\parameter{\alpha_m}} &\sim \normal{0.0, 0.5}\\
+    \markmath{beta}{\parameter{\beta_w}} &\sim \normal{0.0, 0.2}\\
     \markmath{gamma}{\parameter{\gamma^{W}_{w,t}}} &\sim \normal{0.0, 0.2}\\
     \markmath{gamma}{\parameter{\gamma^{M}_{m,t}}} &\sim \normal{0.0, 0.2}\\
     \parameter{\sigma} &\sim \exponential{1.0}\\
@@ -723,48 +819,61 @@ end
   \end{itemize}
 \end{frame}
 
+%\begin{frame}
+%  \begin{columns}
+%    \begin{column}{0.5\textwidth}
+%      \begin{align*}
+%        \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
+%        \mu_j &= \parameter{\alpha}[\observed{M_j}] + \markmath{arrayaccess}{\parameter{\beta}[\observed{C_j}]}\\
+%        \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
+%        \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
+%        \parameter{\sigma} &\sim \exponential{1.0}\\
+%      \end{align*}
+%
+%      \begin{tikzpicture}[minimum size=1cm]
+%        \node[draw] at (-1, 0) {$\alpha_1$};
+%        \node[draw] at (0, 0) {$\alpha_2$};
+%
+%        \node[draw] at (-1, -1) {$\beta_1$};
+%        \node[draw] at (0, -1) {$\beta_2$};
+%        \node[draw] at (1, -1) {$\beta_3$};
+%      \end{tikzpicture}
+%    \end{column}
+%
+%    \begin{column}{0.5\textwidth}
+%      \begin{align*}
+%        \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
+%        \mu_j &= \parameter{\gamma}[\observed{M_j}, \observed{C_j}]\\
+%        \parameter{\gamma_{m,c}} &\sim \normal{0.0, 0.5}\\
+%        \parameter{\sigma} &\sim \exponential{1.0}\\
+%      \end{align*}
+%
+%      \begin{tikzpicture}[minimum size=1cm]
+%        \node[draw] at (-1, 0) {$\gamma_{1,1}$};
+%        \node[draw] at (0, 0) {$\gamma_{1,2}$};
+%        \node[draw] at (1, 0) {$\gamma_{1,3}$};
+%
+%        \node[draw] at (-1, -1) {$\gamma_{2,1}$};
+%        \node[draw] at (0, -1) {$\gamma_{2,2}$};
+%        \node[draw] at (1, -1) {$\gamma_{2,3}$};
+%      \end{tikzpicture}
+%    \end{column}
+%  \end{columns}
+%\end{frame}
+
 \begin{frame}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \begin{align*}
-        \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
-        \mu_j &= \parameter{\alpha}[\observed{M_j}] + \markmath{arrayaccess}{\parameter{\beta}[\observed{C_j}]}\\
-        \markmath{alpha}{\parameter{\alpha_i}} &\sim \normal{0.0, 0.5}\\
-        \markmath{beta}{\parameter{\beta_i}} &\sim \normal{0.0, 0.2}\\
-        \parameter{\sigma} &\sim \exponential{1.0}\\
-      \end{align*}
-
-      \begin{tikzpicture}[minimum size=1cm]
-        \node[draw] at (-1, 0) {$\alpha_1$};
-        \node[draw] at (0, 0) {$\alpha_2$};
-
-        \node[draw] at (-1, -1) {$\beta_1$};
-        \node[draw] at (0, -1) {$\beta_2$};
-        \node[draw] at (1, -1) {$\beta_3$};
-      \end{tikzpicture}
-    \end{column}
-
-    \begin{column}{0.5\textwidth}
-      \begin{align*}
-        \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
-        \mu_j &= \parameter{\gamma}[\observed{M_j}, \observed{C_j}]\\
-        \parameter{\gamma_{m,c}} &\sim \normal{0.0, 0.5}\\
-        \parameter{\sigma} &\sim \exponential{1.0}\\
-      \end{align*}
-
-      \begin{tikzpicture}[minimum size=1cm]
-        \node[draw] at (-1, 0) {$\gamma_{1,1}$};
-        \node[draw] at (0, 0) {$\gamma_{1,2}$};
-        \node[draw] at (1, 0) {$\gamma_{1,3}$};
-
-        \node[draw] at (-1, -1) {$\gamma_{2,1}$};
-        \node[draw] at (0, -1) {$\gamma_{2,2}$};
-        \node[draw] at (1, -1) {$\gamma_{2,3}$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/plot_effect_machine_bloat.pdf}
+  \end{figure}
 \end{frame}
 
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/bayesian-estimate-context-warmup-bloat.pdf}
+  \end{figure}
+\end{frame}
 
 \section{Hierarchical Models}
 
@@ -772,7 +881,7 @@ end
   \center
   \textbf{Hyperpriors}
 
-  {Priors can have priors too}
+  {Priors can have parameters too}
 
   \pause
 
@@ -781,6 +890,122 @@ end
 
   % \emph{Hyperpriors} are priors which are \emph{partially} learned from the data.
 \end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/plot_interaction.pdf}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
+    @model function interaction_model(N, xs, ys, teams)
+        a ~ filldist(Normal(0.0, 0.5), 2)
+
+        b ~ filldist(Normal(0.0, 0.5), 2)
+
+        sigma ~ Exponential(1.0)
+
+        for i in 1:N
+            if teams[i] == 1.0
+                mu_1 = a[1] * xs[i] + b[1]
+                ys[i] ~ Normal(mu_1, sigma)
+            else
+                mu_2 = a[2] * xs[i] + b[2]
+                ys[i] ~ Normal(mu_2, sigma)
+            end
+        end
+    end
+  \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
+    @model function interaction_model(N, xs, ys, teams)
+        sigma_slopes ~ Exponential(0.1)
+        a ~ filldist(Normal(0.0, sigma_slopes), 2)
+
+        b ~ filldist(Normal(0.0, 0.5), 2)
+
+        sigma ~ Exponential(1.0)
+
+        for i in 1:N
+            if teams[i] == 1.0
+                mu_1 = a[1] * xs[i] + b[1]
+                ys[i] ~ Normal(mu_1, sigma)
+            else
+                mu_2 = a[2] * xs[i] + b[2]
+                ys[i] ~ Normal(mu_2, sigma)
+            end
+        end
+    end
+  \end{minted}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Why hyperpriors}
+    \begin{itemize}
+    \item Prevent overfitting
+    \item Use \emph{all} the data
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}
+  \begin{block}{Bayesian inference is:}
+  \begin{itemize}
+  \item \textbf{intuitive} Use probability distributions, no need to learn specific vocabulary
+  \item \textbf{flexible}
+    \begin{itemize}
+    \item Use the distributions you want
+    \item Use the code you want
+    \end{itemize}
+  \item \textbf{honest} if not enough data, you get the priors back
+  \item \textbf{explicit} all your assumptions are visible
+  \item<2-> Sometimes \textbf{slow}
+  \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{The Secret of Stats}
+    \begin{enumerate}
+    \item Generate some fake data (makes you think about what causes what)
+    \item Make a statistical model
+    \item Test if the model can recover parameters
+    \item Use it on experimental data
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Toys to Play With}
+    \begin{itemize}
+    \item Stan (Standalone DSL)
+    \item Turing (Julia)
+    \item Pyro (Python, supported by Uber)
+    \item Bean Machine (Python, supported by Meta)
+    \item Tensorflow Probability (Python, supported by Google)
+    \item PyMC3 (Python)
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Books to Read}
+  \begin{itemize}
+  \item Bayesian Methods for Hackers
+  \item Statistical Rethinking (McElreath)
+  \item The Book of Why (Pearl)
+  \item Causal Inference In Statistics, a primer (Pearl)
+  \end{itemize}
+  \end{block}
+\end{frame}
+
+\section{Extra Slides}
 
 \section{Prior Sensitivity Analysis}
 
@@ -894,25 +1119,6 @@ end
 \end{center}
 \end{frame}
 
-\begin{frame}
-  \begin{block}{The Secret of Stats}
-    \begin{enumerate}
-    \item Generate some fake data (Gelman, McElreath)
-    \item Make a statistical model
-    \item Test if the model can recover parameters
-    \item Use it on experimental data
-    \end{enumerate}
-  \end{block}
-\end{frame}
 
-\begin{frame}
-  Further reading:
-  \begin{itemize}
-  \item Bayesian Methods for Hackers
-  \item Statistical Rethinking
-  \item The Book of Why
-  \item Causal Inference In Statistics, a primer
-  \end{itemize}
-\end{frame}
 
 \end{document}
