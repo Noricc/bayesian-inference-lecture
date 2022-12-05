@@ -202,6 +202,14 @@
 \end{frame}
 
 \begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/no-mans-sky-screenshot.jpg}
+    \caption{No Man's Sky by Hello Games}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
   \center
   \huge
   Bayesian inference
@@ -216,10 +224,21 @@
 \newcommand{\flowers}[0]{{\emoji{bouquet}}\xspace}
 
 \begin{frame}{The Crush Problem}
-  \begin{itemize}
-  \item You observed \flowers.
-  \item What is $P(\text{\love}|\text{\flowers})$?
-  \end{itemize}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \begin{itemize}
+      \item You observed \flowers.
+      \item What is $P(\text{\love}|\text{\flowers})$?
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{figure}[ht]
+        \centering
+        \includegraphics[height=0.8\textheight]{figures/bouquet.jpg}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
 \end{frame}
 
 \section{Maximum Likelihood Estimation}
@@ -395,6 +414,63 @@
   \end{figure}
 \end{frame}
 
+\begin{frame}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/turingjl.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \center
+      \begin{tikzpicture}[>=Stealth]
+        \draw[thick] (0, 2) -- (0, -2);
+        \fill (-2, 0) circle[radius=2pt] node[above] {fixed};
+
+        \draw (-2, 0) -- (0, 0);
+
+        \draw (0,0) -- (2,0) circle[radius=2pt] ;
+        \draw (0,0) -- (2,0.5) circle[radius=2pt] ;
+        \draw (0,0) -- (2,-0.4) circle[radius=2pt] ;
+        \draw (0,0) -- (2,1.2) circle[radius=2pt] ;
+        \draw (0,0) -- (2,-1.3) circle[radius=2pt] ;
+
+        \draw[decorate, decoration={coil, aspect=0}] (1.75, 2) -- (1.75,-2);
+        \draw[decorate, decoration={coil, aspect=0}] (2.25, 2) -- (2.25,-2);
+
+        \draw[->,thick] (-2, -3) -- node[midway,above] {Simulation} (2, -3);
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \center
+      \begin{tikzpicture}[>=Stealth]
+        \draw[thick] (0, 2) -- (0, -2);
+        \draw(-2, 0) circle[radius=2pt];
+        \draw(-2, 0.1) circle[radius=2pt];
+        \draw(-2, 0.07) circle[radius=2pt];
+        \draw(-2, -0.03) circle[radius=2pt];
+        \draw(-2, -0.12) circle[radius=2pt];
+
+        \draw (-2, 0) -- (0, 0);
+
+        \draw[decorate, decoration={coil, aspect=0}] (-1.75, 2) -- (-1.75,-2);
+        \draw[decorate, decoration={coil, aspect=0}] (-2.25, 2) -- (-2.25,-2);
+
+        \draw[fill=black] (2,0) circle[radius=2pt] -- (0,0);
+        \draw[fill=black] (2,0.5) circle[radius=2pt] -- (0,0);
+        \draw[fill=black] (2,-0.4) circle[radius=2pt] -- (0,0);
+        \draw[fill=black] (2,1.2) circle[radius=2pt] -- (0,0);
+        \draw[fill=black] (2,-1.3) circle[radius=2pt] node[below] {fixed} -- (0,0);
+
+
+        \draw[->,thick] (2, -3) -- node[midway,above] {Inference} (-2, -3);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
 % We use the notation from McElreath p.32
 % Paramters and observed parameter
 \newcommand{\parameter}[1]{\textcolor{orange}{#1}}
@@ -404,14 +480,13 @@
 \newcommand{\exponential}[1]{\text{Exponential}(#1)}
 
 \begin{frame}[fragile]
+    % mu_a = 15.0
+    % mu_b = 13.0
+
+    % sigma_a = 4.0
+    % sigma_b = 2.0
     \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
-    function generate_samples()
-        mu_a = 15.0
-        mu_b = 13.0
-
-        sigma_a = 4.0
-        sigma_b = 2.0
-
+    function generate_samples(mu_a, mu_b, sigma_a, sigma_b)
         n_a = 30
         n_b = 20
 
@@ -429,8 +504,6 @@
     end
     \end{minted}
 \end{frame}
-
-
 
 \begin{frame}[fragile]
   \begin{minted}{julia}
@@ -454,12 +527,32 @@ end
   \end{minted}
 \end{frame}
 
+\begin{frame}{Mathematical Model}
+  \begin{align*}
+    \observed{A_i} &\sim \normal{\parameter{\mu_A}, \parameter{\sigma_A}}\\
+    \observed{B_i} &\sim \normal{\parameter{\mu_B}, \parameter{\sigma_B}}\\
+    \parameter{\mu_A} &\sim \normal{10.0, 5.0}\\
+    \parameter{\mu_B} &\sim \normal{10.0, 5.0}\\
+    \parameter{\sigma_A} &\sim \exponential{1.0}\\
+    \parameter{\sigma_B} &\sim \exponential{1.0}\\
+  \end{align*}
+
+  \begin{itemize}
+  \item \parameter{x} Parameter
+  \item \observed{x} Observed
+  \end{itemize}
+\end{frame}
+
+
+
 \begin{frame}[fragile]
   \begin{minted}[autogobble]{julia}
     # Create model (pass the data to it)
     model = means_model(samples_a, samples_b)
+
     # Run bayesian inference
     chain = sample(model, NUTS(0.65), 5000)
+
     # Get posterior samples for a variable in model
     chain[:mean_a]
   \end{minted}
@@ -485,7 +578,6 @@ end
     \includegraphics[width=0.7\textwidth]{figures/plot_a_b_parameters.pdf}
     % \caption{\label{fig:label} }
   \end{figure}
-
 \end{frame}
 
 \section{Posterior predictive simulation}
@@ -496,11 +588,48 @@ end
   Predictions return \emph{distributions} too!
 \end{frame}
 
+\begin{frame}[fragile]
+  \begin{minted}[autogobble]{julia}
+    diff = chain[:mean_b] - chain[:mean_a]
+  \end{minted}
+
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/plot_difference_a_b.pdf}
+  \end{figure}
+\end{frame}
+
 \begin{frame}
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.7\textwidth]{figures/plot_difference_a_b.pdf}
-\end{figure}
+  \begin{itemize}
+  \item \textbf{Prediction:} You know the inputs and the function, but not the outputs
+  \item \textbf{Inference:} You know the outputs and the function, but not the inputs
+  \item \textbf{Learning:} You know the inputs and the outputs, but not the function
+  \end{itemize}
+
+  \begin{block}{Posterior predictive simulation}
+    Make \textbf{predictions} with some uncertain inputs
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
+    function generate_samples(mu_a, mu_b, sigma_a, sigma_b)
+        n_a = 30
+        n_b = 20
+
+        As = zeros(n_a)
+        Bs = zeros(n_b)
+        for i in 1:n_a
+            As[i] = rand(Normal(mu_a, sigma_a))
+        end
+
+        for i in 1:n_b
+            Bs[i] = rand(Normal(mu_b, sigma_b))
+        end
+
+        return (As,Bs)
+    end
+    \end{minted}
 \end{frame}
 
 \begin{frame}
@@ -508,22 +637,6 @@ end
   \centering
   \includegraphics[width=0.7\textwidth]{figures/predicted_difference_a_b.pdf}
 \end{figure}
-\end{frame}
-
-\begin{frame}{Mathematical Model}
-  \begin{align*}
-    \observed{A_i} &\sim \normal{\parameter{\mu_A}, \parameter{\sigma_A}}\\
-    \observed{B_i} &\sim \normal{\parameter{\mu_B}, \parameter{\sigma_B}}\\
-    \parameter{\mu_A} &\sim \normal{10.0, 5.0}\\
-    \parameter{\mu_B} &\sim \normal{10.0, 5.0}\\
-    \parameter{\sigma_A} &\sim \exponential{1.0}\\
-    \parameter{\sigma_B} &\sim \exponential{1.0}\\
-  \end{align*}
-
-  \begin{itemize}
-  \item \parameter{x} Parameter
-  \item \observed{x} Observed
-  \end{itemize}
 \end{frame}
 
 \section{Linear regression}
@@ -534,6 +647,16 @@ end
   \includegraphics[width=0.8\textwidth]{figures/linear_data.pdf}
   \caption{\label{fig:label} Simulated data}
 \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Why is linear regression useful?}
+    \begin{itemize}
+    \item simple model, but easy to extend
+    \item shows positive/negative associations
+    \item interpretable
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}
@@ -579,7 +702,7 @@ end
     \node (priors) at (-1, 1) {Prior(s)};
     \node (posteriors) at (0,0) {Posterior(s)};
     \node (likelihood) at (1,1) {Likelihood};
-    \node (data) at (0,2) {Observations};
+    \node (data) at (-1,2) {Observations};
     \node (structure) at (2,2) {Structure};
 
     \draw[->] (priors) -- (posteriors);
@@ -630,6 +753,16 @@ end
 \section{Interactions}
 
 \begin{frame}
+  \begin{block}{Examples of interactions}
+    \begin{itemize}
+    \item Plants need both \textbf{light} and \textbf{water} to grow.
+    \item To have sweet coffee you need to \textbf{add sugar} and \textbf{stir} the coffee.
+    \item \textbf{Some optimizations} only work on \textbf{some CPUs}.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
   \begin{figure}[ht]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/plot_interaction.pdf}
@@ -664,8 +797,10 @@ end
   How to make my programs faster?
 
   \pause
-
   Is \textbf{depends}
+
+  \pause
+  Depends on what?
 \end{frame}
 
 \begin{frame}
@@ -740,6 +875,13 @@ end
   \end{tikzpicture}
 \end{frame}
 
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/plot_experiment_distributons.pdf}
+  \end{figure}
+\end{frame}
+
 \begin{frame}[fragile]
   \begin{align*}
     \observed{ET_j} &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
@@ -775,9 +917,9 @@ end
   \begin{align*}
     \log(\observed{ET_j}) &\sim \text{Normal}(\mu_j, \parameter{\sigma})\\
     \mu_j &= \log(\observed{\overline{ET}}) + \parameter{\alpha}[\observed{M_j}] + \parameter{\beta}[\observed{W_j}] + \markmath{arrayaccess}{\parameter{\gamma}[\observed{T_j}]}\\
-    \markmath{alpha}{\parameter{\alpha_m}} &\sim \normal{1.0, 0.5}\\
-    \markmath{beta}{\parameter{\beta_w}} &\sim \normal{1.0, 0.2}\\
-    \markmath{gamma}{\parameter{\gamma_t}} &\sim \normal{1.0, 0.2}\\
+    \markmath{alpha}{\parameter{\alpha_m}} &\sim \normal{0.0, 0.5}\\
+    \markmath{beta}{\parameter{\beta_w}} &\sim \normal{0.0, 0.2}\\
+    \markmath{gamma}{\parameter{\gamma_t}} &\sim \normal{0.0, 0.2}\\
     \parameter{\sigma} &\sim \exponential{1.0}\\
   \end{align*}
 
@@ -957,21 +1099,21 @@ end
 \begin{frame}
   \begin{block}{Bayesian inference is:}
   \begin{itemize}
-  \item \textbf{intuitive} Use probability distributions, no need to learn specific vocabulary
-  \item \textbf{flexible}
+  \item \textbf{intuitive:} Use probability distributions, no need to learn specific vocabulary
+  \item \textbf{flexible:}
     \begin{itemize}
     \item Use the distributions you want
     \item Use the code you want
     \end{itemize}
-  \item \textbf{honest} if not enough data, you get the priors back
-  \item \textbf{explicit} all your assumptions are visible
+  \item \textbf{honest:} If not enough data, you get the priors back
+  \item \textbf{explicit:} All your assumptions are visible
   \item<2-> Sometimes \textbf{slow}
   \end{itemize}
   \end{block}
 \end{frame}
 
 \begin{frame}
-  \begin{block}{The Secret of Stats}
+  \begin{block}{My Stats Workflow}
     \begin{enumerate}
     \item Generate some fake data (makes you think about what causes what)
     \item Make a statistical model
