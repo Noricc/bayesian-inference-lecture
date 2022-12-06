@@ -152,6 +152,14 @@
 \end{frame}
 
 \begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/no-mans-sky-screenshot.jpg}
+    \caption{No Man's Sky by Hello Games}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
   \begin{columns}
     \begin{column}{0.5\textwidth}
       \center
@@ -202,11 +210,11 @@
 \end{frame}
 
 \begin{frame}
-  \begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/no-mans-sky-screenshot.jpg}
-    \caption{No Man's Sky by Hello Games}
-  \end{figure}
+  \begin{itemize}
+  \item \textbf{Prediction:} You know the inputs and the function, but not the outputs
+  \item \textbf{Inference:} You know the outputs and the function, but not the inputs
+  \item \textbf{Learning:} You know the inputs and the outputs, but not the function
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -421,6 +429,30 @@
 \end{figure}
 \end{frame}
 
+% We use the notation from McElreath p.32
+% Paramters and observed parameter
+\newcommand{\parameter}[1]{\textcolor{orange}{#1}}
+\newcommand{\observed}[1]{\textcolor{cyan}{#1}}
+
+\newcommand{\normal}[1]{\text{Normal}(#1)}
+\newcommand{\exponential}[1]{\text{Exponential}(#1)}
+
+\begin{frame}{Mathematical Model}
+  \begin{align*}
+    \observed{A_i} &\sim \normal{\parameter{\mu_A}, \parameter{\sigma_A}}\\
+    \observed{B_i} &\sim \normal{\parameter{\mu_B}, \parameter{\sigma_B}}\\
+    \parameter{\mu_A} &\sim \normal{10.0, 5.0}\\
+    \parameter{\mu_B} &\sim \normal{10.0, 5.0}\\
+    \parameter{\sigma_A} &\sim \exponential{1.0}\\
+    \parameter{\sigma_B} &\sim \exponential{1.0}\\
+  \end{align*}
+
+  \begin{itemize}
+  \item \parameter{x} Parameter
+  \item \observed{x} Observed
+  \end{itemize}
+\end{frame}
+
 \begin{frame}
   \begin{columns}
     \begin{column}{0.5\textwidth}
@@ -471,13 +503,9 @@
   \end{columns}
 \end{frame}
 
-% We use the notation from McElreath p.32
-% Paramters and observed parameter
-\newcommand{\parameter}[1]{\textcolor{orange}{#1}}
-\newcommand{\observed}[1]{\textcolor{cyan}{#1}}
 
-\newcommand{\normal}[1]{\text{Normal}(#1)}
-\newcommand{\exponential}[1]{\text{Exponential}(#1)}
+
+
 
 \begin{frame}[fragile]
     % mu_a = 15.0
@@ -486,18 +514,18 @@
     % sigma_a = 4.0
     % sigma_b = 2.0
     \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
-    function generate_samples(mu_a, mu_b, sigma_a, sigma_b)
+    function generate_samples(mean_a, mean_b, stdev_a, stdev_b)
         n_a = 30
         n_b = 20
 
         As = zeros(n_a)
         Bs = zeros(n_b)
         for i in 1:n_a
-            As[i] = rand(Normal(mu_a, sigma_a))
+            As[i] = rand(Normal(mean_a, stdev_a))
         end
 
         for i in 1:n_b
-            Bs[i] = rand(Normal(mu_b, sigma_b))
+            Bs[i] = rand(Normal(mean_b, stdev_b))
         end
 
         return (As,Bs)
@@ -526,24 +554,6 @@
 end
   \end{minted}
 \end{frame}
-
-\begin{frame}{Mathematical Model}
-  \begin{align*}
-    \observed{A_i} &\sim \normal{\parameter{\mu_A}, \parameter{\sigma_A}}\\
-    \observed{B_i} &\sim \normal{\parameter{\mu_B}, \parameter{\sigma_B}}\\
-    \parameter{\mu_A} &\sim \normal{10.0, 5.0}\\
-    \parameter{\mu_B} &\sim \normal{10.0, 5.0}\\
-    \parameter{\sigma_A} &\sim \exponential{1.0}\\
-    \parameter{\sigma_B} &\sim \exponential{1.0}\\
-  \end{align*}
-
-  \begin{itemize}
-  \item \parameter{x} Parameter
-  \item \observed{x} Observed
-  \end{itemize}
-\end{frame}
-
-
 
 \begin{frame}[fragile]
   \begin{minted}[autogobble]{julia}
@@ -580,14 +590,6 @@ end
   \end{figure}
 \end{frame}
 
-\section{Posterior predictive simulation}
-
-\begin{frame}
-  \huge
-  \center
-  Predictions return \emph{distributions} too!
-\end{frame}
-
 \begin{frame}[fragile]
   \begin{minted}[autogobble]{julia}
     diff = chain[:mean_b] - chain[:mean_a]
@@ -597,6 +599,14 @@ end
     \centering
     \includegraphics[width=0.6\textwidth]{figures/plot_difference_a_b.pdf}
   \end{figure}
+\end{frame}
+
+\section{Posterior predictive simulation}
+
+\begin{frame}
+  \huge
+  \center
+  Predictions return \emph{distributions} too!
 \end{frame}
 
 \begin{frame}
@@ -613,18 +623,18 @@ end
 
 \begin{frame}[fragile]
     \begin{minted}[autogobble,fontsize=\footnotesize]{julia}
-    function generate_samples(mu_a, mu_b, sigma_a, sigma_b)
+    function generate_samples(mean_a, mean_b, stdev_a, stdev_b)
         n_a = 30
         n_b = 20
 
         As = zeros(n_a)
         Bs = zeros(n_b)
         for i in 1:n_a
-            As[i] = rand(Normal(mu_a, sigma_a))
+            As[i] = rand(Normal(mean_a, stdev_a))
         end
 
         for i in 1:n_b
-            Bs[i] = rand(Normal(mu_b, sigma_b))
+            Bs[i] = rand(Normal(mean_b, stdev_b))
         end
 
         return (As,Bs)
@@ -725,7 +735,6 @@ end
   \begin{figure}[ht]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/linear_prediction_interval.pdf}
-    \caption{\label{fig:label} }
   \end{figure}
 \end{frame}
 
@@ -797,7 +806,7 @@ end
   How to make my programs faster?
 
   \pause
-  Is \textbf{depends}
+  It \textbf{depends}
 
   \pause
   Depends on what?
@@ -873,6 +882,17 @@ end
     \draw[->] (hardware.west) -- (perf.east);
     \draw[->] (warmup) -- (perf);
   \end{tikzpicture}
+
+  \pause
+  \begin{itemize}
+  \item \textbf{Machines:} Athena, Hades, Hera
+  \item \textbf{Warmup:} Startup (cold JVM), Steady-state (warm JVM)
+  \item \textbf{Treatments:} 0->arraylist, 1->arraymap, ...
+    \begin{itemize}
+    \item Allocation site: 0, 1, 2, ...
+    \item Collection: hashmap, arraylist, ...
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -923,19 +943,34 @@ end
     \parameter{\sigma} &\sim \exponential{1.0}\\
   \end{align*}
 
-  \begin{tikzpicture}[overlay, thick, >=Stealth]
-    \node<2->[right=2cm of arrayaccess] (arrayaccesslabel) {Array access};
-    \draw<2->[->] (arrayaccesslabel) -- (arrayaccess);
-
-    \node<3->[left=2cm of alpha] (alphalabel) {Arrays};
-    \draw<3->[->] (alphalabel) -- (alpha);
-    \draw<3->[->] (alphalabel) -- (beta);
-  \end{tikzpicture}
-
   \begin{itemize}
   \item \parameter{x} Parameter
   \item \observed{x} Observed
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/plot_family_distribution_bloat.pdf}
+    \caption{Effect of machine}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/plot_warmup_distribution_bloat.pdf}
+    \caption{Effect of warmup}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/plot_effects_no_interaction_bloat.pdf}
+    \caption{Effect of treatment}
+  \end{figure}
 \end{frame}
 
 \begin{frame}
@@ -1006,14 +1041,14 @@ end
 \begin{frame}
   \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/plot_effect_machine_bloat.pdf}
+    \includegraphics[width=\textwidth]{figures/plot_effect_machine_bloat.pdf}
   \end{figure}
 \end{frame}
 
 \begin{frame}
   \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/bayesian-estimate-context-warmup-bloat.pdf}
+    \includegraphics[width=0.7\textwidth]{figures/bayesian-estimate-context-warmup-bloat.pdf}
   \end{figure}
 \end{frame}
 
@@ -1141,10 +1176,14 @@ end
   \begin{itemize}
   \item Bayesian Methods for Hackers
   \item Statistical Rethinking (McElreath)
-  \item The Book of Why (Pearl)
-  \item Causal Inference In Statistics, a primer (Pearl)
+  \item Causal Inference In Statistics, a primer (Pearl, Glymour, Jewell)
   \end{itemize}
   \end{block}
+\end{frame}
+
+\begin{frame}
+  \centering
+  Thanks!
 \end{frame}
 
 \section{Extra Slides}
